@@ -1,0 +1,31 @@
+//Number of Nodes: 12
+digraph G {
+	nodesep=1;
+	ranksep=0.6;
+	rankdir=LR;	0 -> 1 [styel=bold,label=" a"];
+	1 -> 2 [styel=bold,label=" ε"];
+	2 -> 3 [styel=bold,label=" ε"];
+	2 -> 4 [styel=bold,label=" ε"];
+	3 -> 10 [styel=bold,label=" ε"];
+	4 -> 6 [styel=bold,label=" ε"];
+	4 -> 8 [styel=bold,label=" ε"];
+	5 -> 3 [styel=bold,label=" ε"];
+	5 -> 4 [styel=bold,label=" ε"];
+	6 -> 7 [styel=bold,label=" a"];
+	7 -> 5 [styel=bold,label=" ε"];
+	8 -> 9 [styel=bold,label=" b"];
+	9 -> 5 [styel=bold,label=" ε"];
+	10 -> 11 [styel=bold,label=" b"];
+	0:body[shape=doublecircle, width=0.4];
+	1:body[shape=circle, width=0.4];
+	2:body[shape=circle, width=0.4];
+	3:body[shape=circle, width=0.4];
+	4:body[shape=circle, width=0.4];
+	5:body[shape=circle, width=0.4];
+	6:body[shape=circle, width=0.4];
+	7:body[shape=circle, width=0.4];
+	8:body[shape=circle, width=0.4];
+	9:body[shape=circle, width=0.4];
+	10:body[shape=circle, width=0.4];
+	11:body[shape=doublecircle, width=0.4];
+}
