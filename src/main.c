@@ -91,35 +91,35 @@ Expr* buildAST(char *str,int len) {
 	// printExpr(expr_stk[expr_stk_top],0);
 }
 
-void buildNFARecursive(NFA **nfa,Expr *expr,int delta) {
+void buildNFARecursive(NFA *nfa,Expr *expr,int delta) {
 	if (expr->is_leaf) {
 		if (addNFATrans(nfa,delta,delta+1,expr->ch)==-1) {
 			// Error Handler
 		}
-		(*nfa)->start=delta;
-		(*nfa)->end=delta+1;
+		nfa->start=delta;
+		nfa->end=delta+1;
 		return ;
 	}
 	int start1=0,end1=0;
 	switch (expr->type) {
 		case EXPR: {
 			buildNFARecursive(nfa,expr->left_expr,delta);
-			start1=(*nfa)->start,end1=(*nfa)->end;
+			start1=nfa->start,end1=nfa->end;
 
-			(*nfa)->start=(*nfa)->end=0;
+			nfa->start=nfa->end=0;
 			buildNFARecursive(nfa,expr->right_expr,delta+expr->left_expr->size);
-			addNFATrans(nfa,end1,(*nfa)->start,0);
-			(*nfa)->start=start1;
+			addNFATrans(nfa,end1,nfa->start,0);
+			nfa->start=start1;
 			break;
 		}
 		case OREXPR: {
 			buildNFARecursive(nfa,expr->left_expr,delta+2);
-			start1=(*nfa)->start,end1=(*nfa)->end;
+			start1=nfa->start,end1=nfa->end;
 
-			(*nfa)->start=(*nfa)->end=0;
+			nfa->start=nfa->end=0;
 			buildNFARecursive(nfa,expr->right_expr,delta+2+expr->left_expr->size);
-			int s2=(*nfa)->start,e2=(*nfa)->end;
-			(*nfa)->start=delta; (*nfa)->end=delta+1;
+			int s2=nfa->start,e2=nfa->end;
+			nfa->start=delta; nfa->end=delta+1;
 
 			addNFATrans(nfa,delta,start1,0);
 			addNFATrans(nfa,delta,s2,0);
@@ -129,9 +129,9 @@ void buildNFARecursive(NFA **nfa,Expr *expr,int delta) {
 		}
 		case STAREXPR: {
 			buildNFARecursive(nfa,expr->expr,delta+2);
-			start1=(*nfa)->start,end1=(*nfa)->end;
+			start1=nfa->start,end1=nfa->end;
 
-			(*nfa)->start=delta; (*nfa)->end=delta+1;
+			nfa->start=delta; nfa->end=delta+1;
 
 			addNFATrans(nfa,delta,delta+1,0);
 			addNFATrans(nfa,delta,start1,0);
@@ -144,8 +144,8 @@ void buildNFARecursive(NFA **nfa,Expr *expr,int delta) {
 NFA *buildNFA(Expr *root) {
 	int size=calcNFASize(root);
 	printf("size=%d\n",size);
-	NFA *nfa=NULL; newNFA(&nfa,size);
-	buildNFARecursive(&nfa,root,0);
+	NFA *nfa=newNFA(size);
+	buildNFARecursive(nfa,root,0);
 	printNFA(nfa);
 	return nfa;
 }

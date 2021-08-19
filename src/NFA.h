@@ -15,13 +15,13 @@ typedef struct NFA {
 	bool *is_recv,is_start;
 } NFA;
 
-void newNFA(NFA **nfa,unsigned int size);
+NFA *newNFA(unsigned int size);
 
-int addNFATrans(NFA **nfa,state_t from,state_t to,char_t ch);
+int addNFATrans(NFA *nfa,state_t from,state_t to,char_t ch);
 
-int addNFARecv(NFA **nfa,state_t recv);
+int addNFARecv(NFA *nfa,state_t recv);
 
-StateList* getNFASucc(NFA *nfa,state_t state,char_t ch);
+StateList *getNFASucc(NFA *nfa,state_t state,char_t ch);
 
 void printNFA(NFA *nfa);
 

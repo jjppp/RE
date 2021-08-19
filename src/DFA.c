@@ -1,42 +1,43 @@
 #include "DFA.h"
 
-void newDFA(DFA **dfa,unsigned int size) {
-	*dfa=(DFA*)malloc(sizeof(DFA));
-	(*dfa)->size=size; (*dfa)->state=0;
+DFA *newDFA(unsigned int size) {
+	DFA *dfa=(DFA*)malloc(sizeof(DFA));
+	dfa->size=size; dfa->state=0;
 	
-	(*dfa)->is_recv=(bool*)calloc(sizeof(bool),size+1);
+	dfa->is_recv=(bool*)calloc(sizeof(bool),size+1);
 	
-	(*dfa)->trans=(DFAtransNode*)calloc(sizeof(DFAtransNode),size+1);
+	dfa->trans=(DFAtransNode*)calloc(sizeof(DFAtransNode),size+1);
+	return dfa;
 }
 
-int addDFATrans(DFA **dfa,state_t from,state_t to,char_t ch) {
-	if (to>=(*dfa)->size) {
+int addDFATrans(DFA *dfa,state_t from,state_t to,char_t ch) {
+	if (to>=dfa->size) {
 		puts("Out of Size!");
 		return -1;
 	}
 
-	(*dfa)->trans[from][ch]=to;
+	dfa->trans[from][ch]=to;
 	printf("addDFATrans %d -> %d, ch=%c\n",from,to,ch);
 	return 0;
 }
 
-int addDFARecv(DFA **dfa,state_t recv) {
-	if (recv>=(*dfa)->size) {
+int addDFARecv(DFA *dfa,state_t recv) {
+	if (recv>=dfa->size) {
 		puts("Out of Size!");
 		return -1;
 	}
 
-	(*dfa)->is_recv[recv]=true;
+	dfa->is_recv[recv]=true;
 	return 0;
 }
 
-state_t moveDFA(DFA **dfa,char_t ch) {
-	state_t state=(*dfa)->state;
-	if (!(*dfa)->trans[state][ch]) {
+state_t moveDFA(DFA *dfa,char_t ch) {
+	state_t state=dfa->state;
+	if (!dfa->trans[state][ch]) {
 		puts("No Such Transfer!");
 		return -1;
 	}
-	return (*dfa)->state=(*dfa)->trans[state][ch];
+	return dfa->state=dfa->trans[state][ch];
 }
 
 void epClosureSingle(NFA *nfa,StateList *ret_list,state_t state) {
@@ -62,7 +63,7 @@ void epClosure(NFA *nfa,StateList *list) {
 }
 
 DFA *NFAtoDFA(NFA *nfa) {
-	DFA *dfa=NULL; newDFA(&dfa,nfa->size*100); // to be improved
+	DFA *dfa=newDFA(nfa->size*100); // to be improved
 	StateList *lists=(StateList*)calloc(sizeof(StateList),dfa->size);
 	insertState(&lists[1],0);
 	epClosure(nfa,&lists[1]);
@@ -93,21 +94,21 @@ DFA *NFAtoDFA(NFA *nfa) {
 			bool flag=false;
 			for (int i=1;i<=total_list;++i) {
 				if (isEqual(&lists[i],tar_list)) {
-					addDFATrans(&dfa,top,i,ch);
+					addDFATrans(dfa,top,i,ch);
 					flag=true;
 				}
 			}
 			
 			if (!flag) {
 				lists[++total_list]=*tar_list;
-				addDFATrans(&dfa,top,total_list,ch);
+				addDFATrans(dfa,top,total_list,ch);
 				stack[++stack_size]=total_list;
 			} else free(tar_list);
 		}
 	}
 	for (int i=1;i<=total_list;++i) {
 		if (isIn(&lists[i],nfa->end)) {
-			addDFARecv(&dfa,i);
+			addDFARecv(dfa,i);
 		}
 	}
 	dfa->size=total_list;

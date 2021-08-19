@@ -1,38 +1,39 @@
 #include "NFA.h"
 #include <ctype.h>
 
-void newNFA(NFA **nfa,unsigned int size) {
-	*nfa=(NFA*)malloc(sizeof(NFA));
-	(*nfa)->size=size;
+NFA *newNFA(unsigned int size) {
+	NFA *nfa=(NFA*)malloc(sizeof(NFA));
+	nfa->size=size;
 	
-	(*nfa)->is_recv=(bool*)calloc(sizeof(bool),size);
-	(*nfa)->is_start=(bool*)calloc(sizeof(bool),size);
+	nfa->is_recv=(bool*)calloc(sizeof(bool),size);
+	nfa->is_start=(bool*)calloc(sizeof(bool),size);
 	
-	(*nfa)->trans=(NFAtransNode*)calloc(sizeof(NFAtransNode),size);
+	nfa->trans=(NFAtransNode*)calloc(sizeof(NFAtransNode),size);
+	return nfa;
 }
 
-int addNFATrans(NFA **nfa,state_t from,state_t to,char_t ch) {
-	if (to>=(*nfa)->size) {
+int addNFATrans(NFA *nfa,state_t from,state_t to,char_t ch) {
+	if (to>=nfa->size) {
 		puts("Out of Size!");
 		return -1;
 	}
 
 	printf("from=%d, to=%d, ch=%d\n",from,to,ch);
 
-	if ((*nfa)->trans[from][ch]==NULL) {
-		(*nfa)->trans[from][ch]=newStateList();
+	if (nfa->trans[from][ch]==NULL) {
+		nfa->trans[from][ch]=newStateList();
 	}
-	insertState((*nfa)->trans[from][ch],to);
+	insertState(nfa->trans[from][ch],to);
 	return 0;
 }
 
-int addNFARecv(NFA **nfa,state_t recv) {
-	if (recv>=(*nfa)->size) {
+int addNFARecv(NFA *nfa,state_t recv) {
+	if (recv>=nfa->size) {
 		puts("Out of Size!");
 		return -1;
 	}
 
-	(*nfa)->is_recv[recv]=true;
+	nfa->is_recv[recv]=true;
 	return 0;
 }
 

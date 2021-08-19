@@ -16,13 +16,13 @@ typedef struct DFA {
 	bool *is_recv;
 } DFA;
 
-void newDFA(DFA **dfa,unsigned int size);
+DFA *newDFA(unsigned int size);
 
-int addDFATrans(DFA **dfa,state_t from,state_t to,char_t ch);
+int addDFATrans(DFA *dfa,state_t from,state_t to,char_t ch);
 
-int addDFARecv(DFA **dfa,state_t recv);
+int addDFARecv(DFA *dfa,state_t recv);
 
-state_t moveDFA(DFA **dfa,char_t ch);
+state_t moveDFA(DFA *dfa,char_t ch);
 
 void printDFA(DFA *dfa);
 
