@@ -27,7 +27,9 @@ StateList* newStateList();
 
 void insertState(StateList *list,state_t state);
 
-bool isEqual(StateList *a,StateList *b);
+void delStateList(StateList *list);
+
+bool isEqual(StateList a,StateList b);
 
 bool isEmpty(StateList *list);
 

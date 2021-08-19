@@ -93,7 +93,7 @@ DFA *NFAtoDFA(NFA *nfa) {
 			epClosure(nfa,tar_list);
 			bool flag=false;
 			for (int i=1;i<=total_list;++i) {
-				if (isEqual(&lists[i],tar_list)) {
+				if (isEqual(lists[i],*tar_list)) {
 					addDFATrans(dfa,top,i,ch);
 					flag=true;
 				}

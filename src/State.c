@@ -14,6 +14,15 @@ StateList* newStateList() {
 	return tmpList;
 }
 
+void delStateList(StateList *list) {
+	if (list==NULL) return ;
+	switch (list->size) {
+		default: for (NFAState *it=list->tail->prev;it!=NULL;it=it->prev) free(it->next);
+		case 1: free(list->head);
+		case 0: free(list);
+	}
+}
+
 void insElem(NFAState *prev,NFAState *next,state_t state) {
 	NFAState *node=newNFAState(state);
 	node->prev=prev; node->next=next;
@@ -71,9 +80,9 @@ bool isIn(StateList *list,state_t state) {
 	return false;
 }
 
-bool isEqual(StateList *a,StateList *b) {
-	if (a->size!=b->size) return false;
-	NFAState *ia=a->head,*ib=b->head;
+bool isEqual(StateList a,StateList b) {
+	if (a.size!=b.size) return false;
+	NFAState *ia=a.head,*ib=b.head;
 	for (;ia!=NULL&&ib!=NULL;ia=ia->next,ib=ib->next) {
 		if (ia->state!=ib->state) return false;
 	}
