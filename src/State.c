@@ -14,24 +14,24 @@ StateList* newStateList() {
 	return tmpList;
 }
 
-void insElem(NFAState *prev,NFAState *next, NFAState *node) {
+void insElem(NFAState *prev,NFAState *next,state_t state) {
+	NFAState *node=newNFAState(state);
 	node->prev=prev; node->next=next;
 	if (prev!=NULL) prev->next=node;
 	if (next!=NULL) next->prev=node;
 }
 
 void insertState(StateList *list,state_t state) {
-	NFAState *node=newNFAState(state);
 	list->size++;
 	if (list->size==1) {
-		list->head=list->tail=node;
+		list->head=list->tail=newNFAState(state);
 		return ;
 	}
 	NFAState *it=list->head;
 	if (it->state>state) {
 		// insElem head
-		insElem(NULL,list->head,node);
-		list->head=node;
+		insElem(NULL,list->head,state);
+		list->head=list->head->prev;
 		return ;
 	} else if (it->state==state) {
 		list->size--;
@@ -41,7 +41,7 @@ void insertState(StateList *list,state_t state) {
 	NFAState *prev=it;
 	for (it=it->next;it!=NULL;it=it->next,prev=prev->next) {
 		if (it->state>state) {
-			insElem(prev,it,node);
+			insElem(prev,it,state);
 			return ;
 		} else if (it->state==state) {
 			list->size--;
@@ -50,8 +50,8 @@ void insertState(StateList *list,state_t state) {
 	}
 
 	// insElem tail
-	insElem(list->tail,NULL,node);
-	list->tail=node;
+	insElem(list->tail,NULL,state);
+	list->tail=list->tail->next;
 }
 
 void mergeList(StateList *a,StateList *b) {

@@ -2,6 +2,7 @@
 digraph G {
 	nodesep=1.5;
 	ranksep=0.6;
+	rankdir=LR;
 	1 -> 2 [styel=bold,label=" a"];
 	2 -> 3 [styel=bold,label=" a"];
 	2 -> 4 [styel=bold,label=" b"];
