@@ -19,7 +19,9 @@ void delStateList(StateList *list) {
 	switch (list->size) {
 		default: for (NFAState *it=list->tail->prev;it!=NULL;it=it->prev) free(it->next);
 		case 1: free(list->head);
-		case 0: free(list);
+		case 0:
+			list->head=list->tail=NULL;
+			list->size=0;
 	}
 }
 
@@ -65,10 +67,29 @@ void insertState(StateList *list,state_t state) {
 
 void mergeList(StateList *a,StateList *b) {
 	if (isEmpty(b)) return ;
-	NFAState *it=b->head;
-	for (;it!=NULL;it=it->next) {
-		insertState(a,it->state);
+	StateList *new_list=newStateList();
+	NFAState *ia=a->head,*ib=b->head;
+	for (;ia!=NULL&&ib!=NULL;) {
+		if (ia->state<ib->state) {
+			insertState(new_list,ia->state);
+			ia=ia->next;
+		} else if (ia->state>ib->state) {
+			insertState(new_list,ia->state);
+			ia=ia->next;
+		} else {
+			insertState(new_list,ia->state);
+			ia=ia->next;
+			ib=ib->next;
+		}
 	}
+	NFAState *it=(ia==NULL)?ib:ia;
+	for (;it!=NULL;it=it->next) {
+		insertState(new_list,it->state);
+	}
+	delStateList(a);
+	a->head=new_list->head;
+	a->tail=new_list->tail;
+	a->size=new_list->size;
 }
 
 bool isIn(StateList *list,state_t state) {
