@@ -48,9 +48,6 @@ void epClosure(NFA *nfa,StateList *list) {
 	StateList *tmp_list=newStateList();
 	while (true) {
 		int rec_size=list->size;
-		if (rec_size>10) {
-			int ggg=0;
-		}
 
 		NFAState *it=list->head;
 		for (;it!=NULL;it=it->next) {
@@ -134,7 +131,7 @@ void printDFA(DFA *dfa) {
 			}
 		}
 	}
-	fprintf(file,"\t1:body[shape=doublecircle, width=0.4];\n",dfa->size);
+	fprintf(file,"\t1:body[shape=doublecircle, width=0.4];\n");
 	for (int state=2;state<=dfa->size;++state) {
 		if (dfa->is_recv[state]) {
 			fprintf(file,"\t%d:body[shape=doublecircle, width=0.4];\n",state);

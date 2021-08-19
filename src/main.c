@@ -53,7 +53,7 @@ int proc(char *str,char *ptr,int len) {
 				} char_stk_top--;
 				break;
 			case '|':case'*':case '+':
-				while (char_stk_top&&prior[char_stk[char_stk_top]]>=prior[str[i]]) {
+				while (char_stk_top&&prior[(int)char_stk[char_stk_top]]>=prior[(int)str[i]]) {
 					ptr[plen++]=char_stk[char_stk_top--];
 				} char_stk[++char_stk_top]=str[i];
 				break;

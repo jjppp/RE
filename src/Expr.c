@@ -13,7 +13,7 @@ Expr* newBinaryExpr(expr_t type,Expr *left_expr,Expr *right_expr) {
 Expr* newUnaryExpr(expr_t type,Expr *child_expr,bool is_leaf,int ch) {
 	Expr *expr=(Expr*)malloc(sizeof(Expr));
 	expr->type=type;
-	if (expr->is_leaf=is_leaf) {
+	if ((expr->is_leaf=is_leaf)) {
 		expr->ch=ch;
 	}
 
@@ -25,7 +25,6 @@ int calcNFASize(Expr *expr) {
 	if (expr->is_leaf) {
 		return expr->size=2;
 	}
-	int res=0;
 	switch (expr->type) {
 		case OREXPR:case EXPR: {
 			int ls=calcNFASize(expr->left_expr);
@@ -36,6 +35,7 @@ int calcNFASize(Expr *expr) {
 		case STAREXPR:
 			return expr->size=calcNFASize(expr->expr)+2;
 	}
+	return -1; // return -1 as an error code
 }
 
 void printExpr(Expr *expr,int dep) {
