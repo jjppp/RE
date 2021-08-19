@@ -124,7 +124,7 @@ void printDFA(DFA *dfa) {
 	fprintf(file,"digraph G {\n\tnodesep=1.5;\n\tranksep=0.6;\n\trankdir=LR;\n");
 	for (int state=1;state<=dfa->size;++state) {
 		// printf("	State: %d, ",state);
-		for (int ch=0;ch<CHAR_SIZE;++ch) {
+		for (char_t ch=0;ch<CHAR_SIZE;++ch) {
 			state_t tar_state=dfa->trans[state][ch];
 			if (tar_state!=0) {
 				fprintf(file,"\t%d -> %d [styel=bold,label=\" %c\"];\n",state,tar_state,ch);

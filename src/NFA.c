@@ -52,7 +52,7 @@ void printNFA(NFA *nfa) {
 	fprintf(file,"digraph G {\n\tnodesep=1;\n\tranksep=0.6;\n\trankdir=LR;\n");
 	for (int state=0;state<nfa->size;++state) {
 		// printf("	State: %d, ",state);
-		for (int ch=0;ch<CHAR_SIZE;++ch) {
+		for (char_t ch=0;ch<CHAR_SIZE;++ch) {
 			if (nfa->trans[state][ch]!=NULL&&nfa->trans[state][ch]->size!=0) {
 				printGraphvizList(file,state,ch,nfa->trans[state][ch]);
 			}
