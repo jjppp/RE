@@ -158,7 +158,9 @@ DFA *minDFA(DFA *dfa) {
 				if (bel[sx]!=bel[sy]) continue;
 				bool flag=false;
 				for (char_t ch=0;ch<CHAR_SIZE;++ch) {
-					if (dfa->trans[sx][ch]!=dfa->trans[sy][ch]) {
+					int tx=dfa->trans[sx][ch],ty=dfa->trans[sy][ch];
+					if (!tx||!ty) continue;
+					if (bel[dfa->trans[sx][ch]]!=bel[dfa->trans[sy][ch]]) {
 						flag=true; break;
 					}
 				}

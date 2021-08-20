@@ -163,6 +163,26 @@ int main(void) {
 	printDFA(dfa,"origin_DFA");
 	DFA *min_dfa=minDFA(dfa);
 	printDFA(min_dfa,"minimized_DFA");
+	while (true) {
+		printf("RE:>");
+		scanf("%s",str);
+		if (str[0]=='@') {
+			puts("Quit!");
+			free(str);
+			free(ptr);
+			return 0;
+		}
+		dfa->state=1;
+		bool flag=false;
+		for (char *it=str;*it!='\0';it++) {
+			if (moveDFA(dfa,(int)*it)==-1) {
+				flag=true;
+				break;
+			}
+		}
+		if (!dfa->is_recv[dfa->state]) flag=false;
+		puts(flag?"failed!":"matched!");
+	}
 	free(str);
 	free(ptr);
 	return 0;

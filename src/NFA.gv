@@ -1,55 +1,9 @@
-//Number of Nodes: 22
+//Number of Nodes: 2
 digraph G {
 	nodesep=1;
 	ranksep=0.6;
 	rankdir=LR;
 	0 -> 1 [styel=bold,label=" ε"];
-	0 -> 2 [styel=bold,label=" ε"];
-	2 -> 4 [styel=bold,label=" ε"];
-	2 -> 6 [styel=bold,label=" ε"];
-	3 -> 1 [styel=bold,label=" ε"];
-	3 -> 2 [styel=bold,label=" ε"];
-	4 -> 5 [styel=bold,label=" a"];
-	5 -> 3 [styel=bold,label=" ε"];
-	6 -> 7 [styel=bold,label=" b"];
-	7 -> 8 [styel=bold,label=" ε"];
-	8 -> 9 [styel=bold,label=" ε"];
-	8 -> 10 [styel=bold,label=" ε"];
-	9 -> 18 [styel=bold,label=" ε"];
-	10 -> 12 [styel=bold,label=" ε"];
-	10 -> 14 [styel=bold,label=" ε"];
-	11 -> 9 [styel=bold,label=" ε"];
-	11 -> 10 [styel=bold,label=" ε"];
-	12 -> 13 [styel=bold,label=" b"];
-	13 -> 11 [styel=bold,label=" ε"];
-	14 -> 15 [styel=bold,label=" a"];
-	15 -> 16 [styel=bold,label=" ε"];
-	16 -> 17 [styel=bold,label=" b"];
-	17 -> 11 [styel=bold,label=" ε"];
-	18 -> 19 [styel=bold,label=" a"];
-	19 -> 20 [styel=bold,label=" ε"];
-	20 -> 21 [styel=bold,label=" a"];
-	21 -> 3 [styel=bold,label=" ε"];
 	0:body[shape=doublecircle, width=0.4];
-	1:body[shape=circle, width=0.4];
-	2:body[shape=circle, width=0.4];
-	3:body[shape=circle, width=0.4];
-	4:body[shape=circle, width=0.4];
-	5:body[shape=circle, width=0.4];
-	6:body[shape=circle, width=0.4];
-	7:body[shape=circle, width=0.4];
-	8:body[shape=circle, width=0.4];
-	9:body[shape=circle, width=0.4];
-	10:body[shape=circle, width=0.4];
-	11:body[shape=circle, width=0.4];
-	12:body[shape=circle, width=0.4];
-	13:body[shape=circle, width=0.4];
-	14:body[shape=circle, width=0.4];
-	15:body[shape=circle, width=0.4];
-	16:body[shape=circle, width=0.4];
-	17:body[shape=circle, width=0.4];
-	18:body[shape=circle, width=0.4];
-	19:body[shape=circle, width=0.4];
-	20:body[shape=circle, width=0.4];
-	21:body[shape=doublecircle, width=0.4];
+	1:body[shape=doublecircle, width=0.4];
 }
