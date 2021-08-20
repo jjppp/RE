@@ -11,7 +11,7 @@ DFA *newDFA(unsigned int size) {
 }
 
 int addDFATrans(DFA *dfa,state_t from,state_t to,char_t ch) {
-	if (to>=dfa->size) {
+	if (to>dfa->size) {
 		puts("Out of Size!");
 		return -1;
 	}
@@ -22,7 +22,7 @@ int addDFATrans(DFA *dfa,state_t from,state_t to,char_t ch) {
 }
 
 int addDFARecv(DFA *dfa,state_t recv) {
-	if (recv>=dfa->size) {
+	if (recv>dfa->size) {
 		puts("Out of Size!");
 		return -1;
 	}
@@ -118,8 +118,82 @@ DFA *NFAtoDFA(NFA *nfa) {
 	return dfa;
 }
 
-void printDFA(DFA *dfa) {
-	FILE *file=fopen("DFA.gv","w");
+struct edge {
+	int y,next;
+} *e;
+
+int *ls,*bel,edCnt;
+
+void addEdge(state_t x,state_t y) {
+	e[++edCnt]=(struct edge) {y,ls[x]}; ls[x]=edCnt;
+}
+
+void color(state_t x,int col) {
+	if (bel[x]) return ;
+	bel[x]=col;
+	for (int i=ls[x];i;i=e[i].next) {
+		color(e[i].y,col);
+	}
+}
+
+DFA *minDFA(DFA *dfa) {
+	unsigned int res_dfa_size=2;
+
+	bel=(int*)calloc(sizeof(int),(dfa->size+1));
+	
+	ls=(int*)calloc(sizeof(int),(dfa->size+1));
+	e=(struct edge*)calloc(sizeof(struct edge),(dfa->size+1)*(dfa->size+1));
+	edCnt=0;
+	
+	for (state_t state=1;state<=dfa->size;++state) {
+		bel[state]=(dfa->is_recv[state])?1:2;
+	}
+
+	while (true) {
+		edCnt=0;
+		for (state_t state=1;state<=dfa->size;state++)
+			ls[state]=0;
+		for (state_t sx=1;sx<=dfa->size;++sx) {
+			for (state_t sy=sx+1;sy<=dfa->size;++sy) {
+				if (bel[sx]!=bel[sy]) continue;
+				bool flag=false;
+				for (char_t ch=0;ch<CHAR_SIZE;++ch) {
+					if (dfa->trans[sx][ch]!=dfa->trans[sy][ch]) {
+						flag=true; break;
+					}
+				}
+				if (!flag) addEdge(sx,sy);
+			}
+		}
+		int col=0;
+		for (state_t state=1;state<=dfa->size;state++)
+			bel[state]=0;
+		for (state_t state=1;state<=dfa->size;state++) {
+			if (bel[state]) continue;
+			color(state,++col);
+		}
+		if (col==res_dfa_size) break;
+		res_dfa_size=col;
+	}
+	DFA *res_dfa=newDFA(res_dfa_size);
+	for (state_t sx=1;sx<=dfa->size;++sx) {
+		if (dfa->is_recv[sx])
+			addDFARecv(res_dfa,bel[sx]);
+		for (char_t ch=0;ch<CHAR_SIZE;ch++) {
+			int from=bel[sx],to=bel[dfa->trans[sx][ch]];
+			if (!to) continue;
+			addDFATrans(res_dfa,from,to,ch);
+		}
+	}
+
+	free(bel); free(e); free(ls);
+	return res_dfa;
+}
+
+void printDFA(DFA *dfa,char *filename) {
+	char *buffer=(char*)calloc(sizeof(char),256);
+	sprintf(buffer,"%s.gv",filename);
+	FILE *file=fopen(buffer,"w");
 	fprintf(file,"//Number of Nodes: %d\n",dfa->size);
 	fprintf(file,"digraph G {\n\tnodesep=1.5;\n\tranksep=0.6;\n\trankdir=LR;\n");
 	for (int state=1;state<=dfa->size;++state) {
@@ -140,4 +214,5 @@ void printDFA(DFA *dfa) {
 	}
 	fprintf(file,"}\n");
 	fclose(file);
+	free(buffer);
 }

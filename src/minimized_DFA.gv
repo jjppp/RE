@@ -1,0 +1,15 @@
+//Number of Nodes: 3
+digraph G {
+	nodesep=1.5;
+	ranksep=0.6;
+	rankdir=LR;
+	1 -> 1 [styel=bold,label=" a"];
+	1 -> 2 [styel=bold,label=" b"];
+	2 -> 3 [styel=bold,label=" a"];
+	2 -> 2 [styel=bold,label=" b"];
+	3 -> 1 [styel=bold,label=" a"];
+	3 -> 2 [styel=bold,label=" b"];
+	1:body[shape=doublecircle, width=0.4];
+	2:body[shape=circle, width=0.4];
+	3:body[shape=circle, width=0.4];
+}

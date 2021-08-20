@@ -24,12 +24,14 @@ int addDFARecv(DFA *dfa,state_t recv);
 
 state_t moveDFA(DFA *dfa,char_t ch);
 
-void printDFA(DFA *dfa);
+void printDFA(DFA *dfa,char *filename);
 
 void epClosureSingle(NFA *nfa,StateList *ret_list,state_t state);
 
 void epClosure(NFA *nfa,StateList *list);
 
 DFA *NFAtoDFA(NFA *nfa);
+
+DFA *minDFA(DFA *dfa);
 
 #endif

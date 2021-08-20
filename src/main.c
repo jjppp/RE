@@ -160,7 +160,9 @@ int main(void) {
 	NFA *nfa=buildNFA(rt);
 	puts("-----");
 	DFA *dfa=NFAtoDFA(nfa);
-	printDFA(dfa);
+	printDFA(dfa,"origin_DFA");
+	DFA *min_dfa=minDFA(dfa);
+	printDFA(min_dfa,"minimized_DFA");
 	free(str);
 	free(ptr);
 	return 0;
