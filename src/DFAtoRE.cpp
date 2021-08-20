@@ -15,7 +15,7 @@ void addEdge(int x,int y,const string &s) {
 void simp(int n,int st,std:: set<int> ed) {
 	std:: map<int,bool> mark;
 	for (int x=1;x<=n;++x) { // eliminate x
-		if (mark[x]||x==st||(ed.find(x)!=ed.end())) continue;
+		if (mark[x]||(ed.find(x)!=ed.end())) continue;
 		for (int y=1;y<=n;++y) if (edge[x][y]) {
 			if (mark[y]||x==y) continue;
 			for (int z=1;z<=n;++z) if (edge[z][x]) {
@@ -27,6 +27,9 @@ void simp(int n,int st,std:: set<int> ed) {
 			}
 		}
 		mark[x]=true;
+	}
+	for (auto ed_point:ed) {
+		std:: cout<<trans[ed_point]<<std::endl;
 	}
 }
 
