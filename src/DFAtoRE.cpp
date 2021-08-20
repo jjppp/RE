@@ -29,7 +29,9 @@ void simp(int n,int st,std:: set<int> ed) {
 		mark[x]=true;
 	}
 	for (auto ed_point:ed) {
-		std:: cout<<trans[ed_point]<<std::endl;
+		for (auto str:trans[ed_point][ed_point]) {
+			std::cout<<str<<"|";
+		}
 	}
 }
 
@@ -38,7 +40,7 @@ char buf[N];
 int main(void) {
 	std:: set<int> ed;
 	FILE *file=fopen("minimized_DFA.gv","r");
-	int n,m,st=1,ed=0;
+	int n,m,st=1;
 	for (int cnt=0;fgets(buf,N,file);++cnt) {
 		if (cnt==0) sscanf(buf,"//Number of Nodes: %d",&n);
 		if (cnt==1) sscanf(buf,"//Number of Edges: %d",&m);
