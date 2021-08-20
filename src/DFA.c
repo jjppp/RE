@@ -197,6 +197,13 @@ void printDFA(DFA *dfa,char *filename) {
 	sprintf(buffer,"%s.gv",filename);
 	FILE *file=fopen(buffer,"w");
 	fprintf(file,"//Number of Nodes: %d\n",dfa->size);
+
+	int edge_cnt=0;
+	for (int state=1;state<=dfa->size;++state)
+		for (char_t ch=0;ch<CHAR_SIZE;++ch)
+			edge_cnt+=(dfa->trans[state][ch]!=0);
+
+	fprintf(file,"//Number of Edges: %d\n",edge_cnt);
 	fprintf(file,"digraph G {\n\tnodesep=1.5;\n\tranksep=0.6;\n\trankdir=LR;\n");
 	for (int state=1;state<=dfa->size;++state) {
 		// printf("	State: %d, ",state);

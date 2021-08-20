@@ -163,9 +163,11 @@ int main(void) {
 	printDFA(dfa,"origin_DFA");
 	DFA *min_dfa=minDFA(dfa);
 	printDFA(min_dfa,"minimized_DFA");
-	while (true) {
-		printf("RE:>");
-		scanf("%s",str);
+	FILE *file=fopen("strings.in","r");
+	while (fscanf(file,"%s",str)!=EOF) {
+	// while (true) {
+		// printf("RE:>");
+		// scanf("%s",str);
 		if (str[0]=='@') {
 			puts("Quit!");
 			free(str);
@@ -177,12 +179,15 @@ int main(void) {
 		for (char *it=str;*it!='\0';it++) {
 			if (moveDFA(dfa,(int)*it)==-1) {
 				flag=true;
-				break;
+				return 0;
+				// break;
 			}
 		}
 		if (!dfa->is_recv[dfa->state]) flag=false;
 		puts(flag?"failed!":"matched!");
+		if (flag) return 0;
 	}
+	// fclose(file);
 	free(str);
 	free(ptr);
 	return 0;
