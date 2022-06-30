@@ -18,13 +18,18 @@
 #define DFA_SIZE 200005
 #define STACK_SIZE 200005
 
-int left_brac[STACK_SIZE],char_stk_top,expr_stk_top;
+typedef Expr *pExpr;
 
-char char_stk[STACK_SIZE];
-Expr *expr_stk[STACK_SIZE];
+int left_brac[STACK_SIZE];
+
+STACK_NODE_DEF(char);
+STACK_NODE_DEF(pExpr);
+
+static stack_t char_stack;
+static stack_t expr_stack;
 
 int preProc(char *str,int len) {
-	char *buf=(char*) calloc(sizeof(char),STACK_SIZE);
+    char *buf = strdup(str);
 	strcpy(buf,str);
 	int slen=1; str[0]=buf[0];
 	for (int i=1,_=len;i<_;++i) {
@@ -35,7 +40,7 @@ int preProc(char *str,int len) {
 	}
 	str[slen]=0;
 	printf("%s\n",str);
-	free(buf);
+    free(buf);
 	return slen;
 }
 
@@ -43,28 +48,40 @@ int proc(char *str,char *ptr,int len) {
     static int prior[CHAR_SIZE] = {
         ['|'] = 1, ['+'] = 2, ['*'] = 3,
     };
-	len=preProc(str,len);
-	int plen=0;
-	for (int i=0;i<len;++i) {
+    len = preProc(str, len);
+    int plen = 0;
+    for (int i = 0; i < len; ++ i) {
 		switch (str[i]) {
 			case '(':
-				char_stk[++char_stk_top]=str[i];
+                stack_push(char_stack, char, str[i]);
 				break;
 			case ')':
-				while (char_stk[char_stk_top] != '(') {
-					ptr[plen++]=char_stk[char_stk_top--];
-				} char_stk_top--;
+                while (stack_top(char_stack, char) != '(') {
+                    ptr[plen ++] = stack_pop(char_stack, char);
+                }
+                stack_pop(char_stack, char);
+				// while (char_stk[char_stk_top] != '(') {
+				// 	ptr[plen++]=char_stk[char_stk_top--];
+				// } char_stk_top--;
 				break;
 			case '|':case'*':case '+':
-				while (char_stk_top&&prior[(int)char_stk[char_stk_top]]>=prior[(int)str[i]]) {
-					ptr[plen++]=char_stk[char_stk_top--];
-				} char_stk[++char_stk_top]=str[i];
+                while (!stack_empty(char_stack)
+                    &&  prior[(int) stack_top(char_stack, char)] >= prior[(int) stack_top(char_stack, char)] ) {
+                        ptr[plen ++] = stack_pop(char_stack, char);
+                    }
+                    stack_push(char_stack, char, str[i]);
+				// while (char_stk_top&&prior[(int)char_stk[char_stk_top]]>=prior[(int)str[i]]) {
+				// 	ptr[plen++]=char_stk[char_stk_top--];
+				// } char_stk[++char_stk_top]=str[i];
 				break;
 			default: ptr[plen++]=str[i];
 		}
 	}
-	while (char_stk_top) ptr[plen++]=char_stk[char_stk_top--];
-	ptr[plen]=0;
+    while (!stack_empty(char_stack)) {
+        ptr[plen ++] = stack_pop(char_stack, char);
+    }
+	// while (char_stk_top) ptr[plen++]=char_stk[char_stk_top--];
+	ptr[plen] = 0;
 	printf("%s\n",ptr);
 	return plen;
 }
@@ -74,22 +91,34 @@ Expr* buildAST(char *str,int len) {
 		Expr *expr_top=NULL;
 		switch (str[i]) {
 			case '|': case '+': {
-				Expr *right_expr=expr_stk[expr_stk_top--];
-				Expr *left_expr=expr_stk[expr_stk_top--];
-				if (str[i]=='+') expr_top=newBinaryExpr(EXPR,left_expr,right_expr);
-				else expr_top=newBinaryExpr(OREXPR,left_expr,right_expr);
+                pExpr right_expr = stack_pop(expr_stack, pExpr);
+                pExpr  left_expr = stack_pop(expr_stack, pExpr);
+
+                if (str[i] == '+') {
+                    expr_top = newBinaryExpr(EXPR, left_expr, right_expr);
+                } else {
+                    expr_top = newBinaryExpr(OREXPR, left_expr, right_expr);
+                }
+				// Expr *right_expr=expr_stk[expr_stk_top--];
+				// Expr *left_expr=expr_stk[expr_stk_top--];
+				// if (str[i]=='+') expr_top=newBinaryExpr(EXPR,left_expr,right_expr);
+				// else expr_top=newBinaryExpr(OREXPR,left_expr,right_expr);
 				break;
 			}
 			case '*':{
-				Expr *child_expr=expr_stk[expr_stk_top--];
-				expr_top=newUnaryExpr(STAREXPR,child_expr,false,0);
+                pExpr child_expr = stack_pop(expr_stack, pExpr);
+                expr_top = newUnaryExpr(STAREXPR, child_expr, false, 0);
+				// Expr *child_expr=expr_stk[expr_stk_top--];
+				// expr_top=newUnaryExpr(STAREXPR,child_expr,false,0);
 				break;
 			}
 			default: expr_top=newUnaryExpr(EXPR,NULL,true,str[i]);
 		}
-		expr_stk[++expr_stk_top]=expr_top;
+        stack_push(expr_stack, pExpr, expr_top);
+		// expr_stk[++expr_stk_top]=expr_top;
 	}
-	return expr_stk[expr_stk_top];
+    return stack_top(expr_stack, pExpr);
+	// return expr_stk[expr_stk_top];
 }
 
 void buildNFARecursive(NFA *nfa,Expr *expr,int delta) {
