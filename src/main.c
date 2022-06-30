@@ -2,52 +2,52 @@
 * Valid Characters:
 * (,),*,|
 * @ stands for \epsilon
-*
-*
 */
 
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+
 #include "State.h"
 #include "Expr.h"
 #include "DFA.h"
 #include "NFA.h"
 #include "stack.h"
+#include "debug.h"
 
 #define DFA_SIZE 200005
 #define STACK_SIZE 200005
 
 typedef Expr *pExpr;
 
-int left_brac[STACK_SIZE];
-
 STACK_NODE_DEF(char);
 STACK_NODE_DEF(pExpr);
 
-static stack_t char_stack;
-static stack_t expr_stack;
-
 int preProc(char *str,int len) {
     char *buf = strdup(str);
-	strcpy(buf,str);
-	int slen=1; str[0]=buf[0];
-	for (int i=1,_=len;i<_;++i) {
-		if ((buf[i-1] != '|'&&buf[i-1]!='(')&&(buf[i]!='|'&&buf[i]!='*'&&buf[i]!=')')) {
-			str[slen++]='+';
+	int slen = 1;
+    str[0] = buf[0];
+    for (int i = 1; i < len; ++ i) {
+		if (buf[i - 1] != '|'
+         && buf[i - 1] != '('
+         && buf[i] != '|'
+         && buf[i] != '*'
+         && buf[i] != ')') {
+			str[slen ++] = '+';
 		}
-		str[slen++]=buf[i];
+		str[slen ++] = buf[i];
 	}
-	str[slen]=0;
-	printf("%s\n",str);
+	str[slen] = 0;
+    debug("%s\n", str);
     free(buf);
 	return slen;
 }
 
 int proc(char *str,char *ptr,int len) {
-    static int prior[CHAR_SIZE] = {
+    static const int prior[CHAR_SIZE] = {
         ['|'] = 1, ['+'] = 2, ['*'] = 3,
     };
+    static stack_t char_stack;
     len = preProc(str, len);
     int plen = 0;
     for (int i = 0; i < len; ++ i) {
@@ -60,19 +60,13 @@ int proc(char *str,char *ptr,int len) {
                     ptr[plen ++] = stack_pop(char_stack, char);
                 }
                 stack_pop(char_stack, char);
-				// while (char_stk[char_stk_top] != '(') {
-				// 	ptr[plen++]=char_stk[char_stk_top--];
-				// } char_stk_top--;
 				break;
 			case '|':case'*':case '+':
                 while (!stack_empty(char_stack)
                     &&  prior[(int) stack_top(char_stack, char)] >= prior[(int) stack_top(char_stack, char)] ) {
-                        ptr[plen ++] = stack_pop(char_stack, char);
-                    }
-                    stack_push(char_stack, char, str[i]);
-				// while (char_stk_top&&prior[(int)char_stk[char_stk_top]]>=prior[(int)str[i]]) {
-				// 	ptr[plen++]=char_stk[char_stk_top--];
-				// } char_stk[++char_stk_top]=str[i];
+                    ptr[plen ++] = stack_pop(char_stack, char);
+                }
+                stack_push(char_stack, char, str[i]);
 				break;
 			default: ptr[plen++]=str[i];
 		}
@@ -80,13 +74,13 @@ int proc(char *str,char *ptr,int len) {
     while (!stack_empty(char_stack)) {
         ptr[plen ++] = stack_pop(char_stack, char);
     }
-	// while (char_stk_top) ptr[plen++]=char_stk[char_stk_top--];
 	ptr[plen] = 0;
 	printf("%s\n",ptr);
 	return plen;
 }
 
 Expr* buildAST(char *str,int len) {
+    static stack_t expr_stack;
 	for (int i=0;i<len;++i) {
 		Expr *expr_top=NULL;
 		switch (str[i]) {
@@ -99,26 +93,18 @@ Expr* buildAST(char *str,int len) {
                 } else {
                     expr_top = newBinaryExpr(OREXPR, left_expr, right_expr);
                 }
-				// Expr *right_expr=expr_stk[expr_stk_top--];
-				// Expr *left_expr=expr_stk[expr_stk_top--];
-				// if (str[i]=='+') expr_top=newBinaryExpr(EXPR,left_expr,right_expr);
-				// else expr_top=newBinaryExpr(OREXPR,left_expr,right_expr);
 				break;
 			}
 			case '*':{
                 pExpr child_expr = stack_pop(expr_stack, pExpr);
                 expr_top = newUnaryExpr(STAREXPR, child_expr, false, 0);
-				// Expr *child_expr=expr_stk[expr_stk_top--];
-				// expr_top=newUnaryExpr(STAREXPR,child_expr,false,0);
 				break;
 			}
 			default: expr_top=newUnaryExpr(EXPR,NULL,true,str[i]);
 		}
         stack_push(expr_stack, pExpr, expr_top);
-		// expr_stk[++expr_stk_top]=expr_top;
 	}
     return stack_top(expr_stack, pExpr);
-	// return expr_stk[expr_stk_top];
 }
 
 void buildNFARecursive(NFA *nfa,Expr *expr,int delta) {
@@ -181,10 +167,13 @@ NFA *buildNFA(Expr *root) {
 	return nfa;
 }
 
-int main(void) {
-	char *str=(char*)calloc(sizeof(char),STACK_SIZE);
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        fprintf(stderr, "Usage: RE pattern");
+        exit(1);
+    }
+    char *str = strdup(argv[1]);
 	char *ptr=(char*)calloc(sizeof(char),STACK_SIZE);
-	scanf("%s",str);
 	int len=strlen(str);
 	int plen=proc(str,ptr,len);
 	Expr *rt=buildAST(ptr,plen);
@@ -207,7 +196,6 @@ int main(void) {
 		puts(flag?"failed!":"matched!");
 		if (flag) return 0;
 	}
-	// fclose(file);
 	free(str);
 	free(ptr);
 	return 0;
