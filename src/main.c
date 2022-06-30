@@ -13,11 +13,12 @@
 #include "Expr.h"
 #include "DFA.h"
 #include "NFA.h"
+#include "stack.h"
 
 #define DFA_SIZE 200005
 #define STACK_SIZE 200005
 
-int left_brac[STACK_SIZE],prior[CHAR_SIZE],char_stk_top,expr_stk_top;
+int left_brac[STACK_SIZE],char_stk_top,expr_stk_top;
 
 char char_stk[STACK_SIZE];
 Expr *expr_stk[STACK_SIZE];
@@ -27,19 +28,21 @@ int preProc(char *str,int len) {
 	strcpy(buf,str);
 	int slen=1; str[0]=buf[0];
 	for (int i=1,_=len;i<_;++i) {
-		if ((buf[i-1]!='|'&&buf[i-1]!='(')&&(buf[i]!='|'&&buf[i]!='*'&&buf[i]!=')')) {
+		if ((buf[i-1] != '|'&&buf[i-1]!='(')&&(buf[i]!='|'&&buf[i]!='*'&&buf[i]!=')')) {
 			str[slen++]='+';
 		}
 		str[slen++]=buf[i];
 	}
 	str[slen]=0;
 	printf("%s\n",str);
-	free(buf); buf=NULL;
+	free(buf);
 	return slen;
 }
 
 int proc(char *str,char *ptr,int len) {
-	prior['|']=1; prior['+']=2; prior['*']=3;
+    static int prior[CHAR_SIZE] = {
+        ['|'] = 1, ['+'] = 2, ['*'] = 3,
+    };
 	len=preProc(str,len);
 	int plen=0;
 	for (int i=0;i<len;++i) {
@@ -48,7 +51,7 @@ int proc(char *str,char *ptr,int len) {
 				char_stk[++char_stk_top]=str[i];
 				break;
 			case ')':
-				while (char_stk[char_stk_top]!='(') {
+				while (char_stk[char_stk_top] != '(') {
 					ptr[plen++]=char_stk[char_stk_top--];
 				} char_stk_top--;
 				break;
@@ -87,8 +90,6 @@ Expr* buildAST(char *str,int len) {
 		expr_stk[++expr_stk_top]=expr_top;
 	}
 	return expr_stk[expr_stk_top];
-	// printf("%d\n",expr_stk_top);
-	// printExpr(expr_stk[expr_stk_top],0);
 }
 
 void buildNFARecursive(NFA *nfa,Expr *expr,int delta) {
@@ -137,6 +138,7 @@ void buildNFARecursive(NFA *nfa,Expr *expr,int delta) {
 			addNFATrans(nfa,delta,start1,0);
 			addNFATrans(nfa,end1,delta+1,0);
 			addNFATrans(nfa,end1,start1,0);
+            break;
 		}
 	}
 }
@@ -163,24 +165,13 @@ int main(void) {
 	printDFA(dfa,"origin_DFA");
 	DFA *min_dfa=minDFA(dfa);
 	printDFA(min_dfa,"minimized_DFA");
-	FILE *file=fopen("strings.in","r");
-	while (fscanf(file,"%s",str)!=EOF) {
-	// while (true) {
-		// printf("RE:>");
-		// scanf("%s",str);
-		if (str[0]=='@') {
-			puts("Quit!");
-			free(str);
-			free(ptr);
-			return 0;
-		}
+    for (printf("RE:>"); scanf("%s", str) != EOF; printf("RE:>")) {
 		dfa->state=1;
 		bool flag=false;
-		for (char *it=str;*it!='\0';it++) {
+		for (char *it=str;*it != '\0';it++) {
 			if (moveDFA(dfa,(int)*it)==-1) {
 				flag=true;
 				return 0;
-				// break;
 			}
 		}
 		if (!dfa->is_recv[dfa->state]) flag=false;
