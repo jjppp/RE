@@ -1,5 +1,6 @@
 #include "NFA.h"
 #include "debug.h"
+#include "utils.h"
 
 #include <ctype.h>
 
@@ -49,22 +50,21 @@ StateList* getNFASucc(NFA *nfa,state_t state,char_t ch) {
 }
 
 void printNFA(NFA *nfa) {
-	FILE *file=fopen("NFA.gv","w");
-	fprintf(file,"//Number of Nodes: %d\n",nfa->size);
-	fprintf(file,"digraph G {\n\tnodesep=1;\n\tranksep=0.6;\n\trankdir=LR;\n");
+	FILE *fp = Fopen("NFA.gv", "w");
+	fprintf(fp,"//Number of Nodes: %d\n",nfa->size);
+	fprintf(fp,"digraph G {\n\tnodesep=1;\n\tranksep=0.6;\n\trankdir=LR;\n");
 	for (int state=0;state<nfa->size;++state) {
-		// printf("	State: %d, ",state);
 		for (char_t ch=0;ch<CHAR_SIZE;++ch) {
 			if (nfa->trans[state][ch]!=NULL&&nfa->trans[state][ch]->size!=0) {
-				printGraphvizList(file,state,ch,nfa->trans[state][ch]);
+				printGraphvizList(fp, state, ch, nfa->trans[state][ch]);
 			}
 		}
 	}
-	fprintf(file,"\t0:body[shape=doublecircle, width=0.4];\n");
+	fprintf(fp,"\t0:body[shape=doublecircle, width=0.4];\n");
 	for (int state=1;state+1<nfa->size;++state) {
-		fprintf(file,"\t%d:body[shape=circle, width=0.4];\n",state);
+		fprintf(fp,"\t%d:body[shape=circle, width=0.4];\n",state);
 	}
-	fprintf(file,"\t%d:body[shape=doublecircle, width=0.4];\n",nfa->size-1);
-	fprintf(file,"}\n");
-	fclose(file);
+	fprintf(fp,"\t%d:body[shape=doublecircle, width=0.4];\n",nfa->size-1);
+	fprintf(fp,"}\n");
+	fclose(fp);
 }

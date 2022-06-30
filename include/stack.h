@@ -34,6 +34,9 @@ typedef struct __stack_t {
 #define stack_top(STACK, TYPE)          \
     (((STACK_NODE_NAME(TYPE) *)(__stack_top(&STACK)))->elem) \
 
+#define stack_init(STACK)  \
+    __stack_init(&STACK)
+
 #define stack_empty(STACK) \
     __stack_empty(&STACK)
 

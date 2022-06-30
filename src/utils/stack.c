@@ -7,6 +7,12 @@ bool __stack_empty(stack_t *stack) {
     return (stack->size == 0);
 }
 
+void __stack_init(stack_t *stack) {
+    *stack = (stack_t) {
+        .size = 0, .top = NULL,
+    } ;
+}
+
 void *__stack_pop(stack_t *stack) {
     assert(stack->size > 0);
     assert(stack->top != NULL);
