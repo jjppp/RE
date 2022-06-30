@@ -193,9 +193,9 @@ DFA *minDFA(DFA *dfa) {
 }
 
 void printDFA(DFA *dfa,char *filename) {
-	char *buffer=(char*)calloc(sizeof(char),256);
-	sprintf(buffer,"%s.gv",filename);
-	FILE *file=fopen(buffer,"w");
+	static char buf[256];
+	sprintf(buf,"%s.gv",filename);
+	FILE *file=fopen(buf,"w");
 	fprintf(file,"//Number of Nodes: %d\n",dfa->size);
 
 	int edge_cnt=0;
@@ -223,5 +223,4 @@ void printDFA(DFA *dfa,char *filename) {
 	}
 	fprintf(file,"}\n");
 	fclose(file);
-	free(buffer);
 }

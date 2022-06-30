@@ -1,4 +1,6 @@
 #include "NFA.h"
+#include "debug.h"
+
 #include <ctype.h>
 
 NFA *newNFA(unsigned int size) {
@@ -18,7 +20,7 @@ int addNFATrans(NFA *nfa,state_t from,state_t to,char_t ch) {
 		return -1;
 	}
 
-	printf("from=%d, to=%d, ch=%d\n",from,to,ch);
+	debug("from=%d, to=%d, ch=%d\n",from,to,ch);
 
 	if (nfa->trans[from][ch]==NULL) {
 		nfa->trans[from][ch]=newStateList();
