@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <sstream>
 #include <stack>
@@ -38,6 +39,7 @@ std::string proc(const std::string &input) {
   std::stack<char> char_stack;
   std::string processed_input = preProc(input);
   std::stringstream result;
+  std::map<char, int> priority{{'|', 1}, {'+', 2}, {'*', 3}};
 
   for (char ch : processed_input) {
     switch (ch) {
@@ -46,7 +48,7 @@ std::string proc(const std::string &input) {
       break;
     }
     case ')': {
-      while (char_stack.top() != '(') {
+      while (!char_stack.empty() && char_stack.top() != '(') {
         result << char_stack.top();
         char_stack.pop();
       }
@@ -56,7 +58,8 @@ std::string proc(const std::string &input) {
     case '|':
     case '*':
     case '+': {
-      while (!char_stack.empty()) {
+      while (!char_stack.empty() &&
+             priority[char_stack.top()] >= priority[ch]) {
         result << char_stack.top();
         char_stack.pop();
       }
@@ -78,40 +81,39 @@ std::string proc(const std::string &input) {
 }
 
 std::shared_ptr<Expr> parse(const std::string &input) {
-  std::vector<std::shared_ptr<Expr>> expr_stack;
+  std::stack<std::shared_ptr<Expr>> expr_stack;
 
   for (char ch : proc(input)) {
     switch (ch) {
     case '|': {
-      auto right_expr = expr_stack.back();
-      expr_stack.pop_back();
-      auto left_expr = expr_stack.back();
-      expr_stack.pop_back();
-      expr_stack.push_back(
-          std::make_shared<OrExpr>(OrExpr(left_expr, right_expr)));
+      auto right_expr = expr_stack.top();
+      expr_stack.pop();
+      auto left_expr = expr_stack.top();
+      expr_stack.pop();
+      expr_stack.push(std::make_shared<OrExpr>(OrExpr(left_expr, right_expr)));
       break;
     }
     case '+': {
-      auto right_expr = expr_stack.back();
-      expr_stack.pop_back();
-      auto left_expr = expr_stack.back();
-      expr_stack.pop_back();
-      expr_stack.push_back(
+      auto right_expr = expr_stack.top();
+      expr_stack.pop();
+      auto left_expr = expr_stack.top();
+      expr_stack.pop();
+      expr_stack.push(
           std::make_shared<ThenExpr>(ThenExpr(left_expr, right_expr)));
       break;
     }
     case '*': {
-      auto sub = expr_stack.back();
-      expr_stack.pop_back();
-      expr_stack.push_back(std::make_shared<StarExpr>(StarExpr(sub)));
+      auto sub = expr_stack.top();
+      expr_stack.pop();
+      expr_stack.push(std::make_shared<StarExpr>(StarExpr(sub)));
       break;
     }
     default: {
-      expr_stack.push_back(std::make_shared<CharExpr>(CharExpr(ch)));
+      expr_stack.push(std::make_shared<CharExpr>(CharExpr(ch)));
     }
     }
   }
-  return expr_stack.back();
+  return expr_stack.top();
 }
 
 std::shared_ptr<NFA> buildNFA(std::shared_ptr<Expr> root) {
