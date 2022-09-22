@@ -126,7 +126,7 @@ std::shared_ptr<DFA> DFA::minimize() const {
 }
 
 void DFA::print_to_file(const std::string &filename) const {
-  std::fstream fs{filename + ".gv"};
+  std::fstream fs{filename + ".gv", std::ios_base::out};
   fs << "//Number of Nodes: " << size_ << std::endl;
 
   std::size_t edge_cnt = 0;
@@ -160,6 +160,7 @@ void DFA::print_to_file(const std::string &filename) const {
     }
   }
   fs << "}";
+  fs.close();
 }
 
 void DFA::reset() { state_ = 1; }
